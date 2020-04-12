@@ -1,0 +1,86 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="mx-auto my-2 order-0 order-md-1 position-relative">
+        <h1 class="text-white">Task Manager</h1>
+    </div>
+</nav>
+<hr/>
+
+<div class="container-fluid">
+    <div class="row mr-1  ml-1">
+        <div class="col-lg-6">
+            <label>
+                Event Name
+                <input type="text" class="form-control" ng-model="eventName" placeholder="Event name"/>
+            </label>
+            <label>
+                <md-datepicker ng-model="eventDate" ng-change="ctrl.onDateChanged()"
+                               md-placeholder="Enter date"></md-datepicker>
+                {{ctrl.myDate | date:shortDate}}
+            </label>
+            <label>
+                Start Time
+                <input type="time" class="form-control" ng-model="eventSTime"/>
+            </label>
+            <label>
+                End Time
+                <input type="time" class="form-control" ng-model="eventETime"/>
+            </label>
+            <!--<input type="button" value="Add Event" class="btn-primary" ng-click="addEvent()"/>-->
+            <button type="button" class="btn btn-primary" ng-click="addEvent()">Add Event</button>
+        </div>
+        <div  ng-show="notice" class="col-lg-6 alert alert-primary" role="alert">
+            {{nxtEvent}}
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            <!--table-->
+            <div class="container">
+                <h2>Events {{selectedDate | date:'yyyy-MM-dd'}}</h2>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Event Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="nm in FilteredEvents">
+                        <td>
+                            <span ng-hide="nm.editing" ng-dblclick="editItem(nm)">{{nm.title}}</span>
+                            <input ng-show="nm.editing" ng-model="nm.title" ng-blur="doneEditing(nm)" autofocus/>
+                        </td>
+                        <td>
+                            <span ng-hide="nm.editing" ng-dblclick="editItem(nm)">{{nm.eventDate}}</span>
+                            <input ng-show="nm.editing" ng-model="nm.eventDate" ng-blur="doneEditing(nm)" autofocus/>
+                        </td>
+                        <td>
+                            <span ng-hide="nm.editing" ng-dblclick="editItem(nm)">{{nm.eventStart}}</span>
+                            <input ng-show="nm.editing" ng-model="nm.eventStart" ng-blur="doneEditing(nm)" autofocus/>
+                        </td>
+                        <td>
+                            <span ng-hide="nm.editing" ng-dblclick="editItem(nm)">{{nm.eventEnd}}</span>
+                            <input ng-show="nm.editing" ng-model="nm.eventEnd" ng-blur="doneEditing(nm)" autofocus/>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" ng-click="removeEvent(nm)">Delete</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <!--calendar-->
+            <div ui-calendar="uiConfig.calendar" class="span8 calendar container" ng-model="eventSources"></div>
+        </div>
+    </div>
+</div>
+
+
