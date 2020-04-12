@@ -39,7 +39,7 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
         };
 
         $scope.addEvent = function () {
-
+            const cTime = new Date();
             if ($scope.eventName.length === 0 || $scope.eventDate.length === 0 || $scope.eventSTime.length === 0 || $scope.eventETime.length === 0) {
                 window.alert("Please fill al the fields");
             } else {
@@ -49,6 +49,11 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
                     y = date.getFullYear();
                 const Stime = new Date(y, m, d, $scope.eventSTime.getHours(), $scope.eventSTime.getMinutes());
                 const Etime = new Date(y, m, d, $scope.eventETime.getHours(), $scope.eventETime.getMinutes());
+
+                if (Stime - cTime < 0 || Etime - Stime < 0 ) {
+                    growl.error('Please recheck the event time.', {title: 'Error!'});
+                    return;
+                }
 
                 $scope.events.push({
                     'title': $scope.eventName,
@@ -61,14 +66,13 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
                     editing: false
                 });
                 growl.success('Event added.', {title: 'Success!'});
+                showNotice();
+                $scope.eventName = '';
+                $scope.eventDate = '';
+                $scope.eventSTime = '';
+                $scope.eventETime = '';
+                $scope.selectedDate = '';
             }
-            $scope.eventName = '';
-            $scope.eventDate = '';
-            $scope.eventSTime = '';
-            $scope.eventETime = '';
-            $scope.selectedDate = '';
-
-            showNotice();
         };
 
         function showNotice() {
@@ -76,22 +80,6 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
             $scope.nxtEvent = 'Next event: ' + (($scope.events.sort((a, b) => a.start - b.start))[0]).title;
         }
 
-        // watch for old events
-        // setInterval(function(){
-        //     const Etime = new Date();
-        //     for (var i = 0; i < $scope.events.length; i++) {
-        //         if ($scope.events[i].start - Etime < 0) {
-        //             $scope.events.splice(i, 1);
-        //         }
-        //     }
-        // }, 5000);
-        // $scope.timerCount=0;
-        // $scope.startTimer=function(){
-        //     $interval(function(){
-        //         console.log($scope.timerCount);
-        //         $scope.timerCount++;
-        //     },1000)
-        // }
         $interval(function () {
                 const Etime = new Date();
                 for (var i = 0; i < $scope.events.length; i++) {
@@ -102,14 +90,13 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
             }
             , 1000)
 
-
         $scope.removeEvent = function (item) {
             for (var i = 0; i < $scope.events.length; i++) {
                 if ($scope.events[i]._id === item._id) {
                     $scope.events.splice(i, 1);
                 }
             }
-            growl.error('Event deleted.', {title: 'Success!'});
+            growl.info('Event deleted.', {title: 'Success!'});
 
             showNotice();
         }
@@ -132,8 +119,6 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
                 editable: true,
                 timeFormat: 'HH:mm',
                 header: {
-                    //left: 'month basicWeek basicDay',
-                    //center: 'title',
                     right: 'today prev,next'
                 },
                 eventClick: function (date, jsEvent, view) {
@@ -148,41 +133,9 @@ angular.module('myApp.view1', ['ngRoute', 'ui.calendar', 'angular-growl'])
                         $scope.FilteredEvents = $scope.events;
                     }
                 },
-                eventDrop: $scope.alertOnDrop,
-                eventResize: $scope.alertOnResize,
                 eventRender: $scope.eventRender
             }
         };
-
-        // $scope.events = [{
-        //     title: 'All Day Event',
-        //     start: new Date(y, m, 1)
-        // }, {
-        //     title: 'Long Event',
-        //     start: new Date(y, m, d - 5),
-        //     end: new Date(y, m, d - 2)
-        // }, {
-        //     id: 999,
-        //     title: 'Repeating Event',
-        //     start: new Date(y, m, d - 3, 16, 0),
-        //     allDay: false
-        // }, {
-        //     id: 999,
-        //     title: 'Repeating Event',
-        //     start: new Date(y, m, d + 4, 16, 0),
-        //     allDay: false
-        // }, {
-        //     title: 'Birthday Party',
-        //     start: new Date(y, m, d + 1, 19, 0),
-        //     end: new Date(y, m, d + 1, 22, 30),
-        //     allDay: false
-        // }, {
-        //     title: 'Click for Google',
-        //     start: new Date(y, m, 28),
-        //     end: new Date(y, m, 29),
-        //     url: 'https://google.com/'
-        // }];
-
         $scope.eventSources = [$scope.events];
     }]);
 
